@@ -5,8 +5,8 @@ export type Succ<N> = {
 export type One = Succ<Z>;
 type add_two<N> = Succ<Succ<N>>;
 
-export type NonLeafAVL<N> = Balanced<N>|RightHeavy<N>|LeftHeavy<N>;
-export type AVL<N> = Leaf|NonLeafAVL<N>;
+export type NonLeafAVL<N> = Balanced<N>| RightHeavy<N>| LeftHeavy<N>;
+export type AVL<N> = Leaf | NonLeafAVL<N>;
 type Leaf = {
   type: 'leaf'
 };
@@ -28,7 +28,8 @@ type RightHeavy<N> = {
   right: AVL<Succ<N>>,
   type: 'rh'
 };
-let leaf: AVL<Z> = {type: 'leaf'};
+
+let leaf: Leaf = {type: 'leaf'};
 
 type AVL_I<N> = {
   type: 'grew',
@@ -56,7 +57,7 @@ function Same<N>(t: AVL<N>): AVL_I<N> {
   return {type: 'same', v: t};
 }
 
-export function singleton<N>(x: number): Balanced<One> {
+export function singleton(x: number): Balanced<One> {
   return {left: leaf, v: x, right: leaf, type: 'bal'};
 }
 
@@ -64,58 +65,60 @@ export function insert<N>(x: number, t: AVL<N>): AVL_I<N> {
   if (t.type === 'leaf') return Grew(singleton(x));
   let {right, v: key, left} = t;
   if (t.type === 'bal') {
-    if (x == t.v) {
+    if (x == key) {
       return Same(t);
-    } else if (x < t.v) {
-      let {type, v: res} = insert(x, t.left);
-      if (type == 'grew') return Grew(LeftHeavy(res, t.v, right));
-      return Same(Balanced(res, t.v, right));
+    } else if (x < key) {
+      let {type, v: new_left} = insert(x, left);
+      if (type == 'grew') return Grew(LeftHeavy(new_left, key, right));
+      return Same(Balanced(new_left, key, right));
     } else {
-      let {type, v: res} = insert(x, t.right);
-      if (type == 'grew') return Grew(RightHeavy(left, t.v, res));
-      return Same(Balanced(left, t.v, res));
+      let {type, v: new_right} = insert(x, right);
+      if (type == 'grew') return Grew(RightHeavy(left, key, new_right));
+      return Same(Balanced(left, key, new_right));
     }
   } else if (t.type === 'lh') {
-    if (x == t.v) {
+    if (x == key) {
       return Same<N>(t);
-    } else if (x < t.v) {
+    } else if (x < key) {
       let {type, v: res} = insert(x, left);
       if (type == 'same') {
-        return Same(LeftHeavy(res, t.v, right));
+        return Same(LeftHeavy(res, key, right));
       } else {
         if (res.type == 'bal') throw new Error('unreachable pattern not detected');
         if (res.type == 'lh') {
-          return Same(Balanced(res.left, res.v, Balanced(res.right, t.v, right)));
+          return Same(Balanced(res.left, res.v, Balanced(res.right, key, right)));
         } else if (res.type == 'rh') {
           let left_right = res.right;
           if (left_right.type == 'lh') {
             return Same(Balanced(
-                Balanced(res.left, t.v, left_right.left), res.v,
+                Balanced(res.left, key, left_right.left), res.v,
                 RightHeavy(left_right.right, left_right.v, right)));
           } else if (left_right.type == 'bal') {
             return Same(Balanced(
-                Balanced(res.left, t.v, left_right.left), res.v,
+                Balanced(res.left, key, left_right.left), res.v,
                 Balanced(left_right.right, left_right.v, right)));
           } else if (left_right.type == 'rh') {
             return Same(Balanced(
-                LeftHeavy(res.left, t.v, left_right.left), res.v,
+                LeftHeavy(res.left, key, left_right.left), res.v,
                 Balanced(left_right.right, left_right.v, right)));
           }
         }
       }
     } else {
       let {type, v: res} = insert(x, right);
-      if (type == 'grew') return Same(Balanced(left, t.v, res));
-      return Same(LeftHeavy(left, t.v, res));
+      if (type == 'grew') return Same(Balanced(left, key, res));
+      return Same(LeftHeavy(left, key, res));
     }
   } else if (t.type == 'rh') {
-    if (x == t.v) {
+    if (x == key) {
+      // t appears to be correctly narrowed to RightHeavy<N>, but still
+      // TS does not infer the type parameter correctly. A TS bug?
       return Same<N>(t);
-    } else if (x < t.v) {
+    } else if (x < key) {
       let {type, v: res} = insert(x, left);
       if (type == 'grew') return Same(Balanced(res, key, right));
       if (type == 'same') return Same(RightHeavy(res, key, right));
-    } else if (x > t.v) {
+    } else if (x > key) {
       let {type, v: res} = insert(x, right);
       if (type == 'same') return Same(RightHeavy(left, key, res));
       if (type == 'grew') {
@@ -131,7 +134,7 @@ export function insert<N>(x: number, t: AVL<N>): AVL_I<N> {
           } else if (right_left.type == 'lh') {
             return Same(Balanced(
                 Balanced(left, key, right_left.left), right_left.v,
-                Balanced(right_left.right, right_key, right_right)));
+                RightHeavy(right_left.right, right_key, right_right)));
           } else if (right_left.type == 'rh') {
             return Same(Balanced(
                 LeftHeavy(left, key, right_left.left), right_left.v,

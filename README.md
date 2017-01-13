@@ -11,6 +11,7 @@ to see if they will be caught by the type checker.
 
 # Observations
 
+- some places needed explcit Same<N>, pointing towards type inference failure.
 - without `match` syntax code is more akward. Typing out types and constructors
   separately is a hassle.
 - union types in TS can express intermediate unions like NonLeaf<N>,

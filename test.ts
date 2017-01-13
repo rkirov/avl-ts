@@ -1,5 +1,6 @@
 import {assert, expect} from 'chai';
-import {singleton, insert, AVL, NonLeafAVL} from './avl';
+
+import {AVL, insert, NonLeafAVL, singleton} from './avl';
 
 function assertNonLeaf<N>(t: AVL<N>): NonLeafAVL<N> {
   if (t.type == 'leaf') throw 'leaf found';
@@ -10,7 +11,7 @@ function assertNonLeaf<N>(t: AVL<N>): NonLeafAVL<N> {
 function traverse<N>(t: AVL<N>): number[] {
   if (t.type == 'leaf') return [];
   // is TS smart enough to infer t is NonLeafAVL.
-  return traverse(t.left).concat(t.v).concat(traverse(t.right)); 
+  return traverse(t.left).concat(t.v).concat(traverse(t.right));
 }
 
 // really N should be equal to times.
