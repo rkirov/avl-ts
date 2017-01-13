@@ -91,16 +91,16 @@ export function insert<N>(x: number, t: AVL<N>): AVL_I<N> {
           let left_right = res.right;
           if (left_right.type == 'lh') {
             return Same(Balanced(
-                Balanced(res.left, key, left_right.left), res.v,
-                RightHeavy(left_right.right, left_right.v, right)));
+                Balanced(res.left, res.v, left_right.left), left_right.v,
+                RightHeavy(left_right.right, key, right)));
           } else if (left_right.type == 'bal') {
             return Same(Balanced(
-                Balanced(res.left, key, left_right.left), res.v,
-                Balanced(left_right.right, left_right.v, right)));
+                Balanced(res.left, res.v, left_right.left), left_right.v,
+                Balanced(left_right.right, key, right)));
           } else if (left_right.type == 'rh') {
             return Same(Balanced(
-                LeftHeavy(res.left, key, left_right.left), res.v,
-                Balanced(left_right.right, left_right.v, right)));
+                LeftHeavy(res.left, res.v, left_right.left), left_right.v,
+                Balanced(left_right.right, key, right)));
           }
         }
       }

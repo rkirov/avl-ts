@@ -78,9 +78,8 @@ describe('AVL', () => {
   it('should do the right thing for random inserts (100 tries)', () => {
     for (let i = 0; i < 100; i++) {
       let t = randomGrow<10>(100, 10);
-      pprint(t);
+      // pprint(t);
       let expectedSortedL = traverse(t);
-      console.log(expectedSortedL);
       let actualSortedL = expectedSortedL.concat().sort((a, b) => a - b);
       expect(expectedSortedL).eql(actualSortedL);
     }
